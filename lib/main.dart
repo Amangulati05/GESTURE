@@ -1,61 +1,59 @@
 import 'package:flutter/material.dart';
-
-void main() => runApp(const MyApp());
-
-class MyApp extends StatelessWidget {
+void main() {
+  runApp(const MyApp());
+}
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    const title = 'Gesture try app';
+  MyAppState createState() {
+    return MyAppState();
+  }
+}
 
-    return const MaterialApp(
+class MyAppState extends State<MyApp> {
+  final items = List<String>.generate(20, (i) => 'Item ${i + 1}');
+
+  @override
+  Widget build(BuildContext context) {
+    const title = 'List of items';
+
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: title,
-      home: MyHomePage(title: title),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  final String title;
-
-  const MyHomePage({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      body: const Center(
-        child: MyButton(),
-      ),
-    );
-  }
-}
-
-class MyButton extends StatelessWidget {
-  const MyButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-
-    return GestureDetector(
-
-      onTap: () {
-        const snackBar = SnackBar(content: Text('Tap'));
-
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      },
-      // The custom button
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.lightBlue,
-          borderRadius: BorderRadius.circular(8),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text(title),
         ),
-        child: const Text('My Button'),
+        body: ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            return Dismissible(
+
+              key: Key(item),
+
+              onDismissed: (direction) {
+
+                setState(() {
+                  items.removeAt(index);
+                });
+
+
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text('$item dismissed')));
+              },
+
+              background: Container(color: Colors.red),
+              child: ListTile(
+                title: Text(item),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
